@@ -1,7 +1,7 @@
 import React from "react";
 import { Title } from "shared/ui/Title";
 
-import { Table } from "shared/ui/table/Table";
+import { Table } from "shared/ui/table";
 import Button from "shared/ui/buttons";
 import { SearchEntity } from "../../features/entity-searcher";
 

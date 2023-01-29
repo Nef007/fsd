@@ -1,2 +1,2 @@
 export * from "./ui";
-export * as contactModel from "./model";
+export * from "./model";

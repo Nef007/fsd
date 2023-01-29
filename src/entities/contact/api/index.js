@@ -6,6 +6,10 @@ export const getContactList = (params) => {
   return apiInstance.get(BASE_URL, { params });
 };
 
-export const getContactById = ({ taskId, ...params }) => {
-  return apiInstance.get(`${BASE_URL}/${taskId}`, { params });
+export const createContact = (params) => {
+  return apiInstance.post(BASE_URL, params);
 };
+
+// export const getContactById = ({ taskId, ...params }) => {
+//   return apiInstance.get(`${BASE_URL}/${taskId}`, { params });
+// };

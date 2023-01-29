@@ -2,12 +2,16 @@ import Tagify from "shared/ui/Tagifi";
 import React from "react";
 import Button from "shared/ui/buttons";
 
-export const columnsContact = [
+import Field from "shared/ui/inputs";
+import { Form } from "react-bootstrap";
+
+export const columnsContact = (onEdit = () => {}, onDelete = () => {}) => [
   {
     name: <em className="fa fa-cog"></em>,
-    render: () => (
+    render: (record) => (
       <>
-        <Button.Edit /> <Button.Delete size="xl" />
+        <Button.Edit onClick={() => onEdit(record)} />{" "}
+        <Button.Delete onClick={() => onDelete(record.id)} size="xl" />
       </>
     ),
     className: "width-10",
@@ -20,7 +24,7 @@ export const columnsContact = [
   },
   {
     name: "Имя",
-    dataIndex: "name",
+    dataIndex: "firstname",
     className: "width-10",
     sorter: true,
   },
@@ -39,12 +43,44 @@ export const columnsContact = [
     className: "width-20",
     render: (record) => (
       <Tagify
-        value={record.tags.map((item) => ({
-          id: item.id,
-          value: item.text,
-          style: "--tag-bg:" + item.color,
-        }))}
+        // key={Date.now()}
+        key={record.id}
+        defaultValue={record.tags}
       />
     ),
   },
 ];
+
+export const ContactForm = ({ form, id, onSubmit }) => {
+  return (
+    <Form id={id} onSubmit={onSubmit}>
+      <Field.Input
+        label="Имя"
+        name="firstname"
+        onChange={form.handleChange}
+        value={form.values.firstname}
+      />
+      <Field.Input
+        label="Почта"
+        name="email"
+        type="email"
+        onChange={form.handleChange}
+        value={form.values.email}
+      />
+      <Field.Input
+        label="Телефон"
+        name="phone"
+        type="tel"
+        onChange={form.handleChange}
+        value={form.values.phone}
+      />
+      <Field label="Теги">
+        <Tagify
+          name="tags"
+          onChange={form.handleChange}
+          value={form.values.tags}
+        />
+      </Field>
+    </Form>
+  );
+};

@@ -11,10 +11,26 @@ export const Table = ({
   columns,
   data,
   loading,
+  pagination = {
+    page: 1,
+    pageSize: 10,
+    total: 0,
+  },
 }) => {
-  const [col, setColumns] = React.useState(columns);
+  const [columnsTable, setColumns] = React.useState(columns);
   const [sorter, setSorter] = React.useState({});
-  const [pagination, setPagination] = React.useState({ page: 1, pageSize: 10 });
+  const [paginationTable, setPagination] = React.useState(pagination);
+
+  const onChangeCheckBox = React.useCallback(
+    (id) => {
+      if (activeCheckBox.includes(id)) {
+        setActiveCheckBox((prev) => prev.filter((item) => item !== id));
+      } else {
+        setActiveCheckBox((prev) => [...prev, id]);
+      }
+    },
+    [activeCheckBox, setActiveCheckBox]
+  );
 
   // установка чекбокса каждой строке
   React.useEffect(() => {
@@ -34,7 +50,12 @@ export const Table = ({
         ...columns,
       ]);
     }
-  }, [activeCheckBox]);
+  }, [activeCheckBox, columns, onChangeCheckBox, setActiveCheckBox]);
+
+  //изменение пагинации
+  React.useEffect(() => {
+    setPagination(pagination);
+  }, [pagination]);
 
   const onChangePagination = (pagination) => {
     setPagination(pagination);
@@ -45,14 +66,6 @@ export const Table = ({
     let sortValue = { field, sort: sorter.sort === "ASC" ? "DESC" : "ASC" };
     setSorter(sortValue);
     onChange({ pagination, sorter: sortValue });
-  };
-
-  const onChangeCheckBox = (id) => {
-    if (activeCheckBox.includes(id)) {
-      setActiveCheckBox((prev) => prev.filter((item) => item !== id));
-    } else {
-      setActiveCheckBox((prev) => [...prev, id]);
-    }
   };
 
   return (
@@ -70,7 +83,7 @@ export const Table = ({
           >
             <thead>
               <tr>
-                {col.map((item, index) => (
+                {columnsTable.map((item, index) => (
                   <th key={index} className={item.className}>
                     {item.name}{" "}
                     {item.sorter && (
@@ -103,12 +116,18 @@ export const Table = ({
             <tbody>
               {data.map((itemData) => (
                 <tr key={itemData.id}>
-                  {col.map((itemColumn, index) => {
+                  {columnsTable.map((itemColumn, index) => {
                     if (itemColumn.render) {
-                      return <td key={index}>{itemColumn.render(itemData)}</td>;
+                      return (
+                        <td key={itemData.id + index}>
+                          {itemColumn.render(itemData)}
+                        </td>
+                      );
                     }
                     return (
-                      <td key={index}>{itemData[itemColumn.dataIndex]}</td>
+                      <td key={itemData.id + index}>
+                        {itemData[itemColumn.dataIndex]}
+                      </td>
                     );
                   })}
                 </tr>
@@ -119,13 +138,17 @@ export const Table = ({
       </div>
       <div className="panel-footer">
         <div className="row">
-          <div className="col col-12 col-sm-4">Страница 1 из 5</div>
+          <div className="col col-12 col-sm-4">
+            Страница {paginationTable.page} из{" "}
+            {Math.ceil(paginationTable.total / paginationTable.pageSize)}
+          </div>
           <div className="col col-12 col-sm-8 text-sm-center ">
             <div className="pagination justify-content-end">
               <PaginationCustom
                 onChange={onChangePagination}
-                defaultPageSize={pagination.pageSize}
-                defaultCurrent={pagination.page}
+                defaultPageSize={paginationTable.pageSize}
+                defaultCurrent={paginationTable.page}
+                total={paginationTable.total}
               />
             </div>
           </div>

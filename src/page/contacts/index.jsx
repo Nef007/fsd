@@ -1,29 +1,14 @@
 import React from "react";
 import { Title } from "shared/ui/Title";
-
-import { Table } from "shared/ui/table/Table";
 import { ExportImportContacts } from "features/contacts-import_export";
 import Button from "shared/ui/buttons";
 import { SearchEntity } from "features/entity-searcher";
-
-import { columnsContact, contactModel } from "entities/contact";
-import { useStore } from "effector-react";
+import { ContactsTable } from "widget/contacts-table";
+import { ContactCreate } from "features/contacts-create";
+import { useToggle } from "react-use";
 
 const ContactsPage = () => {
-  const [activeCheckBox, setActiveCheckBox] = React.useState([]);
-
-  const contacts = useStore(contactModel.$contacts);
-  const loading = useStore(contactModel.$contactListLoading);
-
-  console.log(contacts);
-
-  React.useEffect(() => {
-    contactModel.effects.getContactListFx({ limit: 10 });
-  }, []);
-
-  const onChangeTable = (item) => {
-    console.log(item);
-  };
+  const [activeCreate, setActiveCreate] = useToggle(false);
 
   return (
     <div className="page-content page-content_contacts">
@@ -40,21 +25,17 @@ const ContactsPage = () => {
                 <div className="col col-sm-6 text-end col-12 gy-2">
                   <Button.Primary>Выбрать все</Button.Primary>{" "}
                   <Button.Delete disabled={true} />{" "}
-                  <Button.Primary>Создать</Button.Primary>
+                  <Button.Primary onClick={setActiveCreate}>
+                    Создать
+                  </Button.Primary>
                 </div>
               </div>
             </div>
-            <Table
-              data={contacts}
-              loading={loading}
-              columns={columnsContact}
-              onChange={onChangeTable}
-              activeCheckBox={activeCheckBox}
-              setActiveCheckBox={setActiveCheckBox}
-            />
+            <ContactsTable />
           </div>
         </div>
       </div>
+      <ContactCreate active={activeCreate} setActive={setActiveCreate} />
     </div>
   );
 };

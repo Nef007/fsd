@@ -2,7 +2,7 @@ import React from "react";
 import Tags from "@yaireo/tagify/dist/react.tagify";
 import { useCallback } from "react";
 
-const Tagify = () => {
+const Tagify = ({ value, name, onChange = () => {}, defaultValue }) => {
   const tags = [
     {
       id: 1,
@@ -16,14 +16,6 @@ const Tagify = () => {
     },
   ];
 
-  const [value] = React.useState([
-    {
-      id: 2,
-      value: "soft",
-      style: "--tag-bg:" + "#39b71d",
-    },
-  ]);
-
   const setting = {
     delimiters: ",| ", // [RegEx] split tags by any of these delimiters ("null" to cancel) Example: ",| |."
     pattern: /^.{0,50}$/, // RegEx pattern to validate input by. Ex: /[1-9]/
@@ -36,7 +28,7 @@ const Tagify = () => {
       style: "--tag-bg:" + item.color,
     })), // Array of tags to suggest as the user types (can be used along with "enforceWhitelist" setting)
     blacklist: [], // A list of non-allowed tags
-    enforceWhitelist: true, // Only allow tags from the whitelist
+    enforceWhitelist: false, // Only allow tags from the whitelist
     backspace: false, // false / true / "edit"
     showFilteredDropdown: "a",
     dropdown: {
@@ -57,12 +49,36 @@ const Tagify = () => {
     placeholder: "Введите текст",
   };
 
-  const onChange = useCallback((e) => {
+  const convertTagsValueExport = (tags) => {
+    return tags.map((item) => ({
+      id: item.id,
+      text: item.value,
+      color: item.style.split(":")[1],
+    }));
+  };
+
+  const convertTagsValueImport = (tags) => {
+    return tags && tags.length
+      ? tags.map((item) => ({
+          id: item.id,
+          value: item.text,
+          style: "--tag-bg:" + item.color,
+        }))
+      : undefined;
+  };
+
+  const onChangeT = useCallback((e) => {
     console.log("onChange", e.detail.tagify.getCleanValue());
+    onChange({
+      target: {
+        name: name,
+        value: convertTagsValueExport(e.detail.tagify.getCleanValue()),
+      },
+    });
   }, []);
-  // const onAdd = useCallback((e) => {
-  //   console.log("onAdd", e.detail.tagify.getCleanValue());
-  // }, []);
+  const onAdd = useCallback((e) => {
+    console.log("onAdd", e.detail.tagify.getCleanValue());
+  }, []);
   // const onRemove = useCallback((e) => {
   //   console.log("onRemove", e.detail.tagify.getCleanValue());
   // }, []);
@@ -82,11 +98,12 @@ const Tagify = () => {
     <>
       {/*<Button onClick={addValue}>Add</Button>*/}
       <Tags
-        // defaultValue={value}
-        value={value}
+        name={name}
+        defaultValue={convertTagsValueImport(defaultValue)}
+        value={convertTagsValueImport(value)}
         settings={setting}
         // onAdd={onAdd}
-        onChange={onChange}
+        onChange={onChangeT}
         //  onRemove={onRemove}
       />
     </>

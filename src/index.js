@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "effector-logger/inspector";
+//import "effector-logger/inspector";
 
 import { BrowserRouter } from "react-router-dom";
 import App from "./app";
